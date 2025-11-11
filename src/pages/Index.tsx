@@ -4,12 +4,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 
 interface CraftItem {
   id: string;
   name: string;
-  category: string;
   icon: string;
   materials: { name: string; amount: number; icon: string }[];
 }
@@ -18,7 +17,6 @@ const craftData: CraftItem[] = [
   {
     id: '1',
     name: 'Топор',
-    category: 'Инструменты',
     icon: 'Axe',
     materials: [
       { name: 'Железо', amount: 5, icon: 'Box' },
@@ -29,7 +27,6 @@ const craftData: CraftItem[] = [
   {
     id: '2',
     name: 'Рюкзак',
-    category: 'Экипировка',
     icon: 'Backpack',
     materials: [
       { name: 'Ткань', amount: 8, icon: 'Scroll' },
@@ -40,7 +37,6 @@ const craftData: CraftItem[] = [
   {
     id: '3',
     name: 'Костер',
-    category: 'Базовые',
     icon: 'Flame',
     materials: [
       { name: 'Дерево', amount: 6, icon: 'TreePine' },
@@ -50,7 +46,6 @@ const craftData: CraftItem[] = [
   {
     id: '4',
     name: 'Аптечка',
-    category: 'Медицина',
     icon: 'Heart',
     materials: [
       { name: 'Бинты', amount: 5, icon: 'Bandage' },
@@ -61,7 +56,6 @@ const craftData: CraftItem[] = [
   {
     id: '5',
     name: 'Лук',
-    category: 'Оружие',
     icon: 'Target',
     materials: [
       { name: 'Дерево', amount: 4, icon: 'TreePine' },
@@ -72,7 +66,6 @@ const craftData: CraftItem[] = [
   {
     id: '6',
     name: 'Палатка',
-    category: 'Убежище',
     icon: 'Home',
     materials: [
       { name: 'Ткань', amount: 12, icon: 'Scroll' },
@@ -84,19 +77,15 @@ const craftData: CraftItem[] = [
 
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Все');
   const [selectedItem, setSelectedItem] = useState<CraftItem | null>(null);
   const [craftAmount, setCraftAmount] = useState(1);
-
-  const categories = ['Все', ...Array.from(new Set(craftData.map(item => item.category)))];
 
   const filteredItems = useMemo(() => {
     return craftData.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'Все' || item.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+      return matchesSearch;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery]);
 
   const calculateMaterials = useMemo(() => {
     if (!selectedItem) return [];
@@ -121,26 +110,14 @@ export default function Index() {
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <Card className="p-6">
-              <div className="space-y-4">
-                <div className="relative">
-                  <Icon name="Search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Поиск предметов..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-
-                <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <TabsList className="w-full flex-wrap h-auto">
-                    {categories.map(cat => (
-                      <TabsTrigger key={cat} value={cat} className="text-sm">
-                        {cat}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </Tabs>
+              <div className="relative">
+                <Icon name="Search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Поиск предметов..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
               </div>
             </Card>
 
@@ -162,9 +139,6 @@ export default function Index() {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold">{item.name}</h3>
-                      <Badge variant="secondary" className="mt-1 text-xs">
-                        {item.category}
-                      </Badge>
                     </div>
                     <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
                   </div>
@@ -190,9 +164,6 @@ export default function Index() {
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold">{selectedItem.name}</h2>
-                      <Badge variant="outline" className="mt-1">
-                        {selectedItem.category}
-                      </Badge>
                     </div>
                   </div>
 
