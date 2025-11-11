@@ -61,7 +61,58 @@ const campCraftData: CampItem[] = [
   }
 ];
 
+const workbenchCraftData: CampItem[] = [
+  {
+    id: 'wb1',
+    name: 'Топор',
+    icon: 'Axe',
+    materials: [
+      { name: 'Железо', amount: 5, icon: 'Box' },
+      { name: 'Дерево', amount: 3, icon: 'TreePine' },
+      { name: 'Ткань', amount: 2, icon: 'Scroll' }
+    ]
+  },
+  {
+    id: 'wb2',
+    name: 'Лопата',
+    icon: 'Pickaxe',
+    materials: [
+      { name: 'Железо', amount: 4, icon: 'Box' },
+      { name: 'Дерево', amount: 2, icon: 'TreePine' }
+    ]
+  },
+  {
+    id: 'wb3',
+    name: 'Молоток',
+    icon: 'Hammer',
+    materials: [
+      { name: 'Железо', amount: 3, icon: 'Box' },
+      { name: 'Дерево', amount: 2, icon: 'TreePine' }
+    ]
+  },
+  {
+    id: 'wb4',
+    name: 'Нож',
+    icon: 'Knife',
+    materials: [
+      { name: 'Железо', amount: 2, icon: 'Box' },
+      { name: 'Дерево', amount: 1, icon: 'TreePine' },
+      { name: 'Кожа', amount: 1, icon: 'Square' }
+    ]
+  },
+  {
+    id: 'wb5',
+    name: 'Пила',
+    icon: 'Wrench',
+    materials: [
+      { name: 'Железо', amount: 6, icon: 'Box' },
+      { name: 'Дерево', amount: 3, icon: 'TreePine' }
+    ]
+  }
+];
+
 export default function Index() {
+  const [activeSection, setActiveSection] = useState<'camp' | 'workbench'>('camp');
   const [selectedItems, setSelectedItems] = useState<Map<string, number>>(new Map());
 
   const toggleItem = (itemId: string) => {
@@ -86,9 +137,10 @@ export default function Index() {
 
   const calculateTotalMaterials = () => {
     const totals = new Map<string, { amount: number; icon: string }>();
+    const allData = [...campCraftData, ...workbenchCraftData];
     
     selectedItems.forEach((count, itemId) => {
-      const item = campCraftData.find(i => i.id === itemId);
+      const item = allData.find(i => i.id === itemId);
       if (item) {
         item.materials.forEach(mat => {
           const current = totals.get(mat.name) || { amount: 0, icon: mat.icon };
@@ -122,16 +174,38 @@ export default function Index() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
+          <div className="flex gap-3 mb-6">
+            <Button
+              variant={activeSection === 'camp' ? 'default' : 'outline'}
+              onClick={() => setActiveSection('camp')}
+              className="flex items-center gap-2"
+            >
+              <Icon name="Home" size={20} />
+              Крафт лагеря
+            </Button>
+            <Button
+              variant={activeSection === 'workbench' ? 'default' : 'outline'}
+              onClick={() => setActiveSection('workbench')}
+              className="flex items-center gap-2"
+            >
+              <Icon name="Wrench" size={20} />
+              Верстак
+            </Button>
+          </div>
           <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-            <Icon name="Home" size={28} className="text-primary" />
-            Крафт лагеря
+            <Icon name={activeSection === 'camp' ? 'Home' : 'Wrench'} size={28} className="text-primary" />
+            {activeSection === 'camp' ? 'Крафт лагеря' : 'Крафт на верстаке'}
           </h2>
-          <p className="text-muted-foreground">Выберите постройки для расчёта необходимых материалов</p>
+          <p className="text-muted-foreground">
+            {activeSection === 'camp' 
+              ? 'Выберите постройки для расчёта необходимых материалов'
+              : 'Выберите инструменты для крафта на верстаке'}
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-4">
-            {campCraftData.map(item => {
+            {(activeSection === 'camp' ? campCraftData : workbenchCraftData).map(item => {
               const isSelected = selectedItems.has(item.id);
               const amount = selectedItems.get(item.id) || 1;
 
